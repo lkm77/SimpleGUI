@@ -30,7 +30,7 @@ namespace SimpleGUI
 
     void Win32Window::Update()
     {
-        if (windowManager)windowManager->Update(*this);
+        if (windowManager)windowManager->OnUpdate(*this);
     }
     void Win32Window::ProcessMessages()
     {
@@ -55,7 +55,7 @@ namespace SimpleGUI
         {
         case WM_CREATE:
         {
-            if (windowManager)windowManager->Start(*this);
+            if (windowManager)windowManager->OnStart(*this);
             //窗口创建完成后,启动消息循环线程
             update.Start(&Win32Window::Update, this);
             break;

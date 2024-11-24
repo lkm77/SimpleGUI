@@ -14,13 +14,13 @@ namespace SimpleGUI
         virtual ~WindowManager() {}
     public:
         //窗口创建时调用
-        virtual void Start(Win32Window&) {}
+        virtual void OnStart(Win32Window&) {}
         //窗口销毁时调用
         virtual void OnDestroy(Win32Window&) {}
         //窗口大小改变时调用
         virtual void OnResize(Win32Window&) {}
         //每帧调用
-        virtual void Update(Win32Window&) {}
+        virtual void OnUpdate(Win32Window&) {}
     };
 
     class Win32Window

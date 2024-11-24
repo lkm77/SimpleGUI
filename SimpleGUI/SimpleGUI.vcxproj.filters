@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{49f97e27-e88b-4ea4-9c80-75e5156fd171}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window">
+      <UniqueIdentifier>{4f95ac7c-3776-413a-b479-9b758f7ae0ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window\Win32Window">
+      <UniqueIdentifier>{2af04a7d-714d-4074-a99a-56150969609f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="String">
+      <UniqueIdentifier>{70b91839-c0d1-4eb4-bdd8-4cd0ab3e539a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window\WindowProperties">
+      <UniqueIdentifier>{bb7ca5a6-3d85-4143-b0d1-6cd2044a356b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tool">
+      <UniqueIdentifier>{6d583f25-7448-4ff2-a77b-fad9db985b24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{a6d8432c-e13e-4372-9a45-07e8bbb892f1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32Window.cpp">
+      <Filter>Window\Win32Window</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowProperties.cpp">
+      <Filter>Window\WindowProperties</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Win32Window.h">
+      <Filter>Window\Win32Window</Filter>
+    </ClInclude>
+    <ClInclude Include="String.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowProperties.h">
+      <Filter>Window\WindowProperties</Filter>
+    </ClInclude>
+    <ClInclude Include="Rect.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameRateController.h">
+      <Filter>Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="Loop.h">
+      <Filter>Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadLoop.h">
+      <Filter>Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="Variable.h">
+      <Filter>Tool</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

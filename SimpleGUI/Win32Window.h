@@ -1,26 +1,33 @@
 #pragma once
 #include "WindowProperties.h"
-#include <mutex>
+#include "CallbackFunction.h"
+
 
 namespace SimpleGUI
 {
     class Win32Window;
 
-    //名称暂定，想到更好的名字再改
-    class WindowManager
+    class WindowCallbackFunction
     {
     public:
-        WindowManager() {}
-        virtual ~WindowManager() {}
-    public:
-        //窗口创建时调用
-        virtual void OnStart(Win32Window&) {}
-        //窗口销毁时调用
-        virtual void OnDestroy(Win32Window&) {}
-        //窗口大小改变时调用
-        virtual void OnResize(Win32Window&) {}
-        //每帧调用
-        virtual void OnUpdate(Win32Window&) {}
+        WindowCallbackFunction() {}
+        template<typename T>
+        WindowCallbackFunction(T&& t)
+        {
+            SetCallbackFromClass(std::forward<T>(t));
+        }
+        template<typename T>
+        void SetCallbackFromClass(const T& t)
+        {
+            SimpleGUI_CallbackFunction_Set(t, Start);
+            SimpleGUI_CallbackFunction_Set(t, OnDestroy);
+            SimpleGUI_CallbackFunction_Set(t, OnResize);
+            SimpleGUI_CallbackFunction_Set(t, Update);
+        }
+        SimpleGUI_CallbackFunction(void, Start,     Win32Window&);
+        SimpleGUI_CallbackFunction(void, OnDestroy, Win32Window&);
+        SimpleGUI_CallbackFunction(void, OnResize,  Win32Window&);
+        SimpleGUI_CallbackFunction(void, Update,    Win32Window&);
     };
 
     class Win32Window
@@ -124,10 +131,12 @@ namespace SimpleGUI
         void ControlFrameRate(const bool enable) { update.EnableFrameRateControl(enable); }
         void SetFrameRate(const int frameRate) { update.SetFrameRate(frameRate); }
 
-        //设置窗口管理器
-        void SetWindowManager(std::unique_ptr<WindowManager> manager)
+        //设置窗口回调函数
+        template<class T>
+        void SetCallbackFunction(const T& t )
         {
-            windowManager.Set(std::move(manager));
+            WindowCallbackFunction func(t);
+            callbackFunction.Set(func);
         }
         //设置用户消息处理函数
         void SetUserProcessMessages(std::function<LRESULT(Win32Window& window, UINT uMsg, WPARAM wParam, LPARAM lParam)> func)
@@ -151,7 +160,7 @@ namespace SimpleGUI
         Loop messageLoop;    //消息循环
         ThreadLoop update;   //更新线程循环
 
-        Variable<std::unique_ptr<WindowManager> > windowManager;//窗口管理器
+        Variable<WindowCallbackFunction> callbackFunction;//窗口回调函数
         Variable<std::function<LRESULT(Win32Window& window, UINT uMsg, WPARAM wParam, LPARAM lParam)> > UserProcessMessages;//用户消息处理函数
     };
 }

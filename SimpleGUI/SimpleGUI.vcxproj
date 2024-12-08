@@ -128,18 +128,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Win32Bitmap.cpp" />
     <ClCompile Include="Win32Window.cpp" />
     <ClCompile Include="WindowProperties.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CallbackFunction.h" />
     <ClInclude Include="FrameRateController.h" />
     <ClInclude Include="Loop.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="ThreadLoop.h" />
     <ClInclude Include="Variable.h" />
-    <ClInclude Include="Win32Bitmap.h" />
     <ClInclude Include="Win32Window.h" />
     <ClInclude Include="WindowProperties.h" />
   </ItemGroup>

@@ -5,9 +5,30 @@
 
 namespace SimpleGUI
 {
-	//声明模板类Variable
 	template<typename T>
-	class Variable{};
+	class Variable
+	{
+	public://由另一个线程调用
+		void Set(T& t)
+		{
+			tempValue = t;
+			modify.store(true);
+		}
+	public://由一个工作线程调用
+		inline const T& Get()
+		{
+			if (modify.load())
+			{
+				value = std::move(tempValue);
+				modify.store(false);
+			}
+			return value;
+		}
+	private:
+		std::atomic<bool> modify = false;
+		T value = NULL;
+		T tempValue = NULL;
+	};
 
 	template<typename T>
 	class Variable<std::unique_ptr<T> >
@@ -43,7 +64,7 @@ namespace SimpleGUI
 		std::unique_ptr<T> value= nullptr;
 		std::unique_ptr<T> tempValue= nullptr;
 	};
-	template<typename ReturnType,typename... Args>
+	template<typename ReturnType, typename... Args>
 	class Variable<std::function<ReturnType(Args...)> >
 	{
 	public://由另一个线程调用
@@ -62,18 +83,19 @@ namespace SimpleGUI
 			}
 			return value != nullptr;
 		}
-		inline ReturnType operator()()
+		inline ReturnType operator()(Args... args)
 		{
 			if (modify.load())
 			{
 				value = std::move(tempValue);
 				modify.store(false);
 			}
-			return value();
+			return value(std::forward<Args>(args)...);
 		}
 	private:
 		std::atomic<bool> modify = false;
 		std::function<ReturnType(Args...)> value = nullptr;
 		std::function<ReturnType(Args...)> tempValue = nullptr;
 	};
+	
 }

@@ -30,7 +30,7 @@ namespace SimpleGUI
 
     void Win32Window::Update()
     {
-        if (windowManager)windowManager->OnUpdate(*this);
+        if (callbackFunction.Get().Update)callbackFunction.Get().Update(*this);
     }
     void Win32Window::ProcessMessages()
     {
@@ -55,7 +55,7 @@ namespace SimpleGUI
         {
         case WM_CREATE:
         {
-            if (windowManager)windowManager->OnStart(*this);
+            if (callbackFunction.Get().Start)callbackFunction.Get().Start(*this);
             //窗口创建完成后,启动消息循环线程
             update.Start(&Win32Window::Update, this);
             break;
@@ -63,18 +63,18 @@ namespace SimpleGUI
         case WM_SIZE:
         {
             wc.clientRect.SetSize(LOWORD(lParam), HIWORD(lParam));
-            if (windowManager)windowManager->OnResize(*this);
+            if (callbackFunction.Get().OnResize)callbackFunction.Get().OnResize(*this);
             break;
         }
         case WM_DESTROY:
             update.Close();
 
-            if (windowManager)windowManager->OnDestroy(*this);
+            if (callbackFunction.Get().OnDestroy)callbackFunction.Get().OnDestroy(*this);
 
             PostQuitMessage(0);
             break;
         }
-        //if (UserProcessMessages)return UserProcessMessages(*this, uMsg, wParam, lParam);
+        if (UserProcessMessages)return UserProcessMessages(*this, uMsg, wParam, lParam);
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
         }
     

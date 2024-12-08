@@ -9,7 +9,6 @@
 #include "Loop.h"
 #include "ThreadLoop.h"
 #include "Variable.h"
-#include "Win32Bitmap.h"
 
 namespace SimpleGUI
 {

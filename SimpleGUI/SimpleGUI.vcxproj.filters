@@ -37,7 +37,6 @@
     <ClCompile Include="WindowProperties.cpp">
       <Filter>Window\WindowProperties</Filter>
     </ClCompile>
-    <ClCompile Include="Win32Bitmap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Win32Window.h">
@@ -64,6 +63,8 @@
     <ClInclude Include="Variable.h">
       <Filter>Tool</Filter>
     </ClInclude>
-    <ClInclude Include="Win32Bitmap.h" />
+    <ClInclude Include="CallbackFunction.h">
+      <Filter>Tool</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

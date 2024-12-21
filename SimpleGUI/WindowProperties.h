@@ -6,9 +6,6 @@
 
 #include "Rect.h"
 #include "String.h"
-#include "Loop.h"
-#include "ThreadLoop.h"
-#include "Variable.h"
 
 namespace SimpleGUI
 {
@@ -59,7 +56,7 @@ namespace SimpleGUI
         HWND parent = nullptr;
         HMENU menu = nullptr;
 
-        Rect clientRect;
+        Rect clientRect;//屏幕坐标系下的客户区矩形
         SimpleGUI::String name = TEXT("Win32Window");
         SimpleGUI::Win32Style style = { WS_OVERLAPPEDWINDOW,NULL };
 

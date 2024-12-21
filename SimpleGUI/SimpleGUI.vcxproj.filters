@@ -54,16 +54,19 @@
     <ClInclude Include="FrameRateController.h">
       <Filter>Tool</Filter>
     </ClInclude>
-    <ClInclude Include="Loop.h">
+    <ClInclude Include="Variable.h">
+      <Filter>Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="CallbackFunction.h">
+      <Filter>Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="BItmap.h">
       <Filter>Tool</Filter>
     </ClInclude>
     <ClInclude Include="ThreadLoop.h">
       <Filter>Tool</Filter>
     </ClInclude>
-    <ClInclude Include="Variable.h">
-      <Filter>Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="CallbackFunction.h">
+    <ClInclude Include="Loop.h">
       <Filter>Tool</Filter>
     </ClInclude>
   </ItemGroup>

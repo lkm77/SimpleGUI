@@ -132,6 +132,7 @@
     <ClCompile Include="WindowProperties.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BItmap.h" />
     <ClInclude Include="CallbackFunction.h" />
     <ClInclude Include="FrameRateController.h" />
     <ClInclude Include="Loop.h" />

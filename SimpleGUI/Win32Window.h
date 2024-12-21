@@ -1,6 +1,10 @@
 #pragma once
 #include "WindowProperties.h"
 #include "CallbackFunction.h"
+#include "Loop.h"
+#include "ThreadLoop.h"
+#include "Variable.h"
+#include "Bitmap.h"
 
 
 namespace SimpleGUI
@@ -26,29 +30,15 @@ namespace SimpleGUI
         }
         SimpleGUI_CallbackFunction(void, Start,     Win32Window&);
         SimpleGUI_CallbackFunction(void, OnDestroy, Win32Window&);
-        SimpleGUI_CallbackFunction(void, OnResize,  Win32Window&);
+        //注意:在OnResize与Update都有绘制操作时,会导致窗口闪烁
+        SimpleGUI_CallbackFunction(void, OnResize, Win32Window&);
         SimpleGUI_CallbackFunction(void, Update,    Win32Window&);
     };
+    class UpdateLoop;
 
     class Win32Window
     {
     public:
-
-        static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-        {
-            Win32Window* pThis=nullptr;
-            if (uMsg == WM_NCCREATE)
-            {
-                CREATESTRUCT* pCreate = (CREATESTRUCT*)lParam;
-                pThis = (Win32Window*)pCreate->lpCreateParams;
-                pThis->hwnd = hwnd;
-                SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)pCreate->lpCreateParams);
-            }
-            else pThis = (Win32Window*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-
-            if (pThis) return pThis->WindowProc(uMsg, wParam, lParam);
-            else return DefWindowProc(hwnd, uMsg, wParam, lParam);
-        }
         Win32Window() : hwnd(nullptr)
         {
             wc.wndClass.cbClsExtra = 0;//窗口类的附加数据buff的大小(buff:缓冲区)
@@ -64,7 +54,7 @@ namespace SimpleGUI
             
             RegisterClass(&wc.wndClass);//RegisterClass会检查是否已经注册过，如果已经注册过，则不再注册
         }
-        virtual ~Win32Window()
+        ~Win32Window()
         {
             Close(true);
             UnregisterClass(wc.wndClass.lpszClassName, hinstance);//UnregisterClass会检查是否已经注册过，如果没有注册过，则不再注销
@@ -102,8 +92,11 @@ namespace SimpleGUI
         int GetClientWidth() const { return wc.clientRect.Width(); }
         //获取窗口客户区高度
         int GetClientHeight() const { return wc.clientRect.Height(); }
+        //获取窗口客户区矩形,客户区坐标系
+        Rect GetClientRect() const { return Rect(0, 0, wc.clientRect.Width(), wc.clientRect.Height()); }
         //获取Win32Class
         const Win32Class& GetWin32Class() const { return wc; }
+
 
         //设置窗口客户区位置
         void SetClientPosition(const int x, const int y)
@@ -128,12 +121,19 @@ namespace SimpleGUI
             MoveWindow(hwnd, rect.left, rect.top, rect.Width(), rect.Height(), TRUE);
         }
 
-        void ControlFrameRate(const bool enable) { update.EnableFrameRateControl(enable); }
-        void SetFrameRate(const int frameRate) { update.SetFrameRate(frameRate); }
+    private:
+        //创建窗口
+        void CreateWin32Window();
+    private:
+        HWND hwnd;  //窗口句柄
+        Win32Class wc;  //窗口类
+        bool isCreating=false;  //是否正在创建
 
+
+    public:
         //设置窗口回调函数
         template<class T>
-        void SetCallbackFunction(const T& t )
+        void SetCallbackFunction(const T& t)
         {
             WindowCallbackFunction func(t);
             callbackFunction.Set(func);
@@ -143,25 +143,40 @@ namespace SimpleGUI
         {
             UserProcessMessages.Set(func);
         }
-
+        void EnableUpdateFrameRateControl(bool enable) { updateFrameRateController.EnableFrameRateControl(enable); }
+        void SetUpdateTargetFPS(int frameRate) { updateFrameRateController.SetTargetFPS(frameRate); }
     private:
-        //创建窗口
-        void CreateWin32Window();
+        static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+        {
+            Win32Window* pThis = nullptr;
+            if (uMsg == WM_NCCREATE)
+            {
+                CREATESTRUCT* pCreate = (CREATESTRUCT*)lParam;
+                pThis = (Win32Window*)pCreate->lpCreateParams;
+                pThis->hwnd = hwnd;
+                SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)pCreate->lpCreateParams);
+            }
+            else pThis = (Win32Window*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+
+            if (pThis) return pThis->WindowProc(uMsg, wParam, lParam);
+            else return DefWindowProc(hwnd, uMsg, wParam, lParam);
+        }
+        LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);//处理窗口消息
+        void ProcessMessages();//消息循环
+
         void Update();
-        //消息循环
-        void ProcessMessages();
-        //处理窗口消息
-        LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
     private:
-        HWND hwnd;  //窗口句柄
-        Win32Class wc;  //窗口类
-
-        bool isCreating=false;  //是否正在创建
         Loop messageLoop;    //消息循环
         ThreadLoop update;   //更新线程循环
+        FrameRateController updateFrameRateController;//更新帧率控制器
+        std::atomic<bool> resizeFlag = false;
 
         Variable<WindowCallbackFunction> callbackFunction;//窗口回调函数
         Variable<std::function<LRESULT(Win32Window& window, UINT uMsg, WPARAM wParam, LPARAM lParam)> > UserProcessMessages;//用户消息处理函数
+    public:
+        HDC GetMemoryDC() const { return bitmap.GetMemoryDC(); }
+    private:
+        Bitmap bitmap= Bitmap(wc.clientRect.Width(), wc.clientRect.Height());
     };
 }
 

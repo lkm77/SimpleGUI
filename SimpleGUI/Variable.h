@@ -11,17 +11,22 @@ namespace SimpleGUI
 	public://由另一个线程调用
 		void Set(T& t)
 		{
+			while (modify)Sleep(100);
 			tempValue = t;
 			modify.store(true);
 		}
 	public://由一个工作线程调用
-		inline const T& Get()
+		//处理修改
+		void ProcessingModifications()
 		{
 			if (modify.load())
 			{
 				value = std::move(tempValue);
 				modify.store(false);
 			}
+		}
+		inline const T& Get()
+		{
 			return value;
 		}
 	private:
@@ -36,27 +41,26 @@ namespace SimpleGUI
 	public://由另一个线程调用
 		void Set(std::unique_ptr<T> ptr)
 		{
+			while (modify)Sleep(100);
 			tempValue = std::move(ptr);
 			modify.store(true);
 		}
 	public://由一个工作线程调用
-		inline  operator bool()
+		//处理修改
+		void ProcessingModifications()
 		{
 			if (modify.load())
 			{
 				value = std::move(tempValue);
 				modify.store(false);
 			}
+		}
+		inline  operator bool()
+		{
 			return (bool)value;
-			//return value.get() != nullptr;
 		}
 		inline T* operator->()
 		{
-			if (modify.load())
-			{
-				value = std::move(tempValue);
-				modify.store(false);
-			}
 			return value.get();
 		}
 	private:
@@ -70,26 +74,26 @@ namespace SimpleGUI
 	public://由另一个线程调用
 		void Set(const std::function<ReturnType(Args...)>& f)
 		{
+			while (modify)Sleep(100);
 			tempValue = f;
 			modify.store(true);
 		}
 	public://由一个工作线程调用
-		inline operator bool()
+		//处理修改
+		void ProcessingModifications()
 		{
 			if (modify.load())
 			{
 				value = std::move(tempValue);
 				modify.store(false);
 			}
-			return value != nullptr;
+		}
+		inline operator bool()
+		{
+			return (bool)value;
 		}
 		inline ReturnType operator()(Args... args)
 		{
-			if (modify.load())
-			{
-				value = std::move(tempValue);
-				modify.store(false);
-			}
 			return value(std::forward<Args>(args)...);
 		}
 	private:

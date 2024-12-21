@@ -28,8 +28,6 @@ namespace SimpleGUI
 			if (workerThread.joinable()) workerThread.join();
 			exit = false;
 		}
-		void EnableFrameRateControl(bool enable) { frameRateController.EnableFrameRateControl(enable); }
-		void SetFrameRate(int frameRate) { frameRateController.SetTargetFPS(frameRate); }
 	private:
 		void LoopHandler()
 		{
@@ -37,7 +35,6 @@ namespace SimpleGUI
 			while (!exit)
 			{
 				statement();
-				frameRateController.waitForNextFrame();
 			}
 			isLooping = false;
 			statement = nullptr;
@@ -48,6 +45,5 @@ namespace SimpleGUI
 
 		bool exit = false;
 		bool isLooping = false;
-		FrameRateController frameRateController;
 	};
 }

@@ -53,6 +53,7 @@ namespace SimpleGUI
             }
         }
         bitmap.DrawToHwnd(hwnd);
+        Sleep(10);//ºı…ŸCPU’º”√
     }
 
     void Win32Window::ProcessMessages()

@@ -26,6 +26,9 @@
     <Filter Include="Geometry">
       <UniqueIdentifier>{a6d8432c-e13e-4372-9a45-07e8bbb892f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tool\Bitmap">
+      <UniqueIdentifier>{94cdbcaa-5c44-429d-9bd9-aed0e32df281}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -36,6 +39,9 @@
     </ClCompile>
     <ClCompile Include="WindowProperties.cpp">
       <Filter>Window\WindowProperties</Filter>
+    </ClCompile>
+    <ClCompile Include="Bitmap.cpp">
+      <Filter>Tool\Bitmap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -60,14 +66,14 @@
     <ClInclude Include="CallbackFunction.h">
       <Filter>Tool</Filter>
     </ClInclude>
-    <ClInclude Include="BItmap.h">
-      <Filter>Tool</Filter>
-    </ClInclude>
     <ClInclude Include="ThreadLoop.h">
       <Filter>Tool</Filter>
     </ClInclude>
     <ClInclude Include="Loop.h">
       <Filter>Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="BItmap.h">
+      <Filter>Tool\Bitmap</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

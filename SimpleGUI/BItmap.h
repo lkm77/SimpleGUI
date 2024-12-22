@@ -42,7 +42,10 @@ namespace SimpleGUI
 		{
 			SetSize(size);
 		}
-		~Bitmap() {}
+		~Bitmap()
+		{
+			DeleteMemoryDC();
+		}
 
 		void SetWidth(const int w)
 		{
@@ -93,19 +96,19 @@ namespace SimpleGUI
 
 		HDC GetMemoryDC() const
 		{
-			return hdcMem;
+			return memoryDC;
 		}
 		void Clear(const COLORREF color=RGB(240, 240, 240))
 		{
 			if (IsEmpty())return;
 			RECT rect = { 0, 0, size.width, size.height };
-			FillRect(hdcMem, &rect, (HBRUSH)(COLOR_WINDOW + 1));
+			FillRect(memoryDC, &rect, (HBRUSH)(COLOR_WINDOW + 1));
 		}
 
 		void DrawToHdc(HDC hdc)
 		{
 			if (IsEmpty())return;
-			BitBlt(hdc, 0, 0, size.width, size.height, hdcMem, 0, 0, SRCCOPY);
+			BitBlt(hdc, 0, 0, size.width, size.height, memoryDC, 0, 0, SRCCOPY);
 		}
 		void DrawToHwnd(HWND hwnd)
 		{
@@ -116,43 +119,44 @@ namespace SimpleGUI
 		}
 
 	private:
-		void CreateHdcMem()
+		void CreateMemoryDC()
 		{
-			DeleteHdcMem();
-			HDC hdc = GetDC(NULL);// 创建一个与设备相关的内存DC
-			hdcMem = CreateCompatibleDC(hdc);
-			ReleaseDC(NULL, hdc);
+			DeleteMemoryDC();
+			memoryDC = CreateCompatibleDC(NULL);
 		}
-		void DeleteHdcMem()
+		void DeleteMemoryDC()
 		{
-			if (hdcMem == nullptr)return;
-			DeleteBitmap();
-			DeleteDC(hdcMem);
-			hdcMem = nullptr;
+			if (memoryDC==nullptr)return;
+			DeleteObject(SelectObject(memoryDC, memoryOldHBitmap));
+			memoryOldHBitmap=nullptr;
+			DeleteDC(memoryDC);
+			memoryDC = nullptr;
 		}
-		bool CreateBitmap(const int realWidht, const int realHeight)
+		void CreateBitmap(const int realWidth, const int realHeight)
 		{
-			if (realWidht < 0 || realHeight < 0)return false;
-			DeleteBitmap();
-			realSize.SetSize(realWidht, realHeight);
-			if (hdcMem == nullptr)CreateHdcMem();
-			if (hdcMem == nullptr)return false;
-			HBITMAP hBitmap = CreateCompatibleBitmap(hdcMem, realWidht, realHeight);
-			if (hBitmap == nullptr)return false;
-			oldBitmap = SelectObject(hdcMem, hBitmap);
-			return true;
-		}
-		void DeleteBitmap()
-		{
-			if (oldBitmap != nullptr)DeleteObject(SelectObject(hdcMem, oldBitmap));
+			if(memoryDC==nullptr)CreateMemoryDC();
+			if(memoryDC==nullptr)return;
+			HBITMAP hBitmap = CreateCompatibleBitmap(memoryDC, realWidth, realHeight);
+			HBITMAP fromHBitmap = (HBITMAP)SelectObject(memoryDC, hBitmap);
+
+			HDC fromHdc = CreateCompatibleDC(memoryDC);
+			HBITMAP fromOldHBitmap = (HBITMAP)SelectObject(fromHdc, fromHBitmap);
+
+			BitBlt(memoryDC, 0, 0, min(realWidth, realSize.width), min(realHeight, realSize.height), fromHdc, 0, 0, SRCCOPY);
+
+			SelectObject(fromHdc, fromOldHBitmap);
+			DeleteObject(fromHBitmap);
+			DeleteDC(fromHdc);
+			realSize.SetSize(realWidth, realHeight);
 		}
 		bool IsEmpty() const
 		{
-			return !(oldBitmap && hdcMem);
+			return memoryDC==nullptr;
 		}
+
+		HDC memoryDC = nullptr;
+		HBITMAP memoryOldHBitmap = nullptr;
 	private:
-		HDC hdcMem = nullptr;
-		HGDIOBJ oldBitmap = nullptr;
 		BitmapSize size;
 		BitmapSize realSize;
 	};

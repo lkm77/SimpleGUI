@@ -5,6 +5,7 @@
 #include "ThreadLoop.h"
 #include "Variable.h"
 #include "Bitmap.h"
+#include "IOStream.h"
 
 
 namespace SimpleGUI
@@ -34,7 +35,17 @@ namespace SimpleGUI
         SimpleGUI_CallbackFunction(void, OnResize, Win32Window&);
         SimpleGUI_CallbackFunction(void, Update,    Win32Window&);
     };
-    class UpdateLoop;
+
+    struct Win32WindowMessage
+    {
+        Win32WindowMessage(UINT uMsg=NULL, WPARAM wParam=NULL, LPARAM lParam=NULL) :uMsg(uMsg), wParam(wParam), lParam(lParam){}
+        UINT uMsg;
+        WPARAM wParam;
+        LPARAM lParam;
+    };
+    typedef Win32WindowMessage Message;
+    typedef InputStream<Message> MessageInput;
+    typedef IOStream<Message> MessageIO;
 
     class Win32Window
     {
@@ -42,7 +53,7 @@ namespace SimpleGUI
         Win32Window() : hwnd(nullptr)
         {
             wc.wndClass.cbClsExtra = 0;//窗口类的附加数据buff的大小(buff:缓冲区)
-            wc.wndClass.cbWndExtra = 0;//窗口的附加数据buff的大小(buff:缓冲区)
+            wc.wndClass.cbWndExtra = sizeof(Win32Window*);//窗口的附加数据buff的大小(buff:缓冲区)
             wc.wndClass.hbrBackground = NULL;//绘制窗口背景的画刷句柄(窗口背景颜色)
             wc.wndClass.hCursor = NULL;//鼠标的句柄[窗口光标(NULL:默认光标)]
             wc.wndClass.hIcon = NULL; //窗口图标(NULL:默认图标)
@@ -94,6 +105,8 @@ namespace SimpleGUI
         int GetClientHeight() const { return wc.clientRect.Height(); }
         //获取窗口客户区矩形,客户区坐标系
         Rect GetClientRect() const { return Rect(0, 0, wc.clientRect.Width(), wc.clientRect.Height()); }
+        //获取窗口客户区矩形,屏幕坐标系
+        Rect GetClientRectScreen() const { return wc.clientRect; }
         //获取Win32Class
         const Win32Class& GetWin32Class() const { return wc; }
 
@@ -177,6 +190,12 @@ namespace SimpleGUI
         HDC GetMemoryDC() const { return bitmap.GetMemoryDC(); }
     private:
         Bitmap bitmap= Bitmap(wc.clientRect.Width(), wc.clientRect.Height());
+
+
+    public:
+        MessageInput GetMessageStream() { return MessageInput(messageStream);}
+    private:
+        MessageIO messageStream;  //窗口消息流
     };
 }
 

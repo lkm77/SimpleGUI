@@ -75,5 +75,8 @@
     <ClInclude Include="BItmap.h">
       <Filter>Tool\Bitmap</Filter>
     </ClInclude>
+    <ClInclude Include="IOStream.h">
+      <Filter>Tool</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -136,6 +136,7 @@
     <ClInclude Include="BItmap.h" />
     <ClInclude Include="CallbackFunction.h" />
     <ClInclude Include="FrameRateController.h" />
+    <ClInclude Include="IOStream.h" />
     <ClInclude Include="Loop.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="String.h" />

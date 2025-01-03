@@ -85,6 +85,12 @@ namespace SimpleGUI
             update.Start(&Win32Window::Update, this);
             break;
         }
+        case WM_MOVING:
+        {
+            RECT* rect = (RECT*)lParam;
+            wc.clientRect.SetPosition(rect->left, rect->top);
+            break;
+        }
         case WM_SIZE:
         {
             wc.clientRect.SetSize(LOWORD(lParam), HIWORD(lParam));
@@ -100,6 +106,7 @@ namespace SimpleGUI
             PostQuitMessage(0);
             break;
         }
+        messageStream << Message(uMsg, wParam, lParam);
         if (UserProcessMessages)return UserProcessMessages(*this, uMsg, wParam, lParam);
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
         }

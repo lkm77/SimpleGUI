@@ -3,6 +3,7 @@
 #include <functional>
 #include <iostream>
 #include <windows.h>
+#include <windowsx.h>
 
 #include "Rect.h"
 #include "String.h"

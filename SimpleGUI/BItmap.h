@@ -98,11 +98,18 @@ namespace SimpleGUI
 		{
 			return memoryDC;
 		}
+		HBITMAP GetHBitmap() const
+		{
+			return hBitmap;
+		}
+
 		void Clear(const COLORREF color=RGB(240, 240, 240))
 		{
 			if (IsEmpty())return;
 			RECT rect = { 0, 0, size.width, size.height };
-			FillRect(memoryDC, &rect, (HBRUSH)(COLOR_WINDOW + 1));
+			HBRUSH brush = CreateSolidBrush(color);
+			FillRect(memoryDC, &rect, brush);
+			DeleteObject(brush);
 		}
 
 		void DrawToHdc(HDC hdc)
@@ -122,21 +129,25 @@ namespace SimpleGUI
 		void CreateMemoryDC()
 		{
 			DeleteMemoryDC();
+			HDC hdc = GetDC(NULL);
 			memoryDC = CreateCompatibleDC(NULL);
+			ReleaseDC(NULL, hdc);
 		}
 		void DeleteMemoryDC()
 		{
 			if (memoryDC==nullptr)return;
-			DeleteObject(SelectObject(memoryDC, memoryOldHBitmap));
-			memoryOldHBitmap=nullptr;
 			DeleteDC(memoryDC);
+			DeleteObject(hBitmap);
 			memoryDC = nullptr;
 		}
 		void CreateBitmap(const int realWidth, const int realHeight)
 		{
 			if(memoryDC==nullptr)CreateMemoryDC();
 			if(memoryDC==nullptr)return;
-			HBITMAP hBitmap = CreateCompatibleBitmap(memoryDC, realWidth, realHeight);
+
+			HDC hdc = GetDC(NULL);
+			hBitmap = CreateCompatibleBitmap(hdc, realWidth, realHeight);//使用内存DC只能创建单色位图,所以使用整个屏幕的DC
+			ReleaseDC(NULL, hdc);
 			HBITMAP fromHBitmap = (HBITMAP)SelectObject(memoryDC, hBitmap);
 
 			HDC fromHdc = CreateCompatibleDC(memoryDC);
@@ -155,7 +166,7 @@ namespace SimpleGUI
 		}
 
 		HDC memoryDC = nullptr;
-		HBITMAP memoryOldHBitmap = nullptr;
+		HBITMAP hBitmap= nullptr;
 	private:
 		BitmapSize size;
 		BitmapSize realSize;
